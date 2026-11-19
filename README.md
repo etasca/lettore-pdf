@@ -47,7 +47,7 @@ Per aprire i PDF con doppio clic: tasto destro su un PDF → **Apri con** → **
 
 ### Limiti noti
 
-- La versione **Mac non è ancora stata provata** su un Mac vero: segnalaci qualsiasi problema.
+- La versione **Mac** è stata provata su un Mac con processore **Intel**, ma non ancora su un Mac con processore **Apple Silicon** (M1, M2, M3, M4…): se ne hai uno, segnalaci come va. Con PDF pieni di immagini la prima visualizzazione di una pagina può richiedere qualche secondo.
 - Nei PDF **protetti da password** non si possono ancora salvare note.
 - Salvare note dentro un PDF **firmato digitalmente** rende la firma non più valida (l'app avvisa; usa "Salva con nome" per lasciare intatto l'originale).
 - Non compila moduli e non modifica il testo del PDF.
@@ -106,7 +106,7 @@ To open PDFs with a double click: right-click a PDF → **Open with** → **Lett
 
 ### Known limitations
 
-- The **Mac version hasn't been tested** on a real Mac yet: please report any problem.
+- The **Mac version** has been tested on an **Intel** Mac, but not yet on an **Apple Silicon** Mac (M1, M2, M3, M4…): if you have one, please let us know how it works. PDFs full of images may take a few seconds to show a page the first time.
 - Notes can't be saved into **password-protected** PDFs yet.
 - Saving notes into a **digitally signed** PDF invalidates the signature (the app warns you; use "Save as" to keep the original intact).
 - It doesn't fill forms or edit the PDF's text.
