@@ -8,4 +8,4 @@ Lettore PDF include o usa questi progetti open source. / Lettore PDF includes or
 | [pdf-lib](https://github.com/Hopding/pdf-lib) | Scrittura di note ed evidenziazioni nei PDF | MIT | `src/vendor/LICENSE-pdf-lib.md` |
 | [Tauri](https://github.com/tauri-apps/tauri) e plugin ufficiali | Applicazione desktop | MIT / Apache License 2.0 | https://github.com/tauri-apps/tauri |
 
-I file di PDF.js in `src/vendor/` (pdf.min.mjs, pdf.worker.min.mjs, cmaps, standard_fonts, textlayer.css) non sono stati modificati, tranne `textlayer.css`, estratto da `pdf_viewer.css`.
+I file di PDF.js in `src/vendor/` (pdf.min.mjs e pdf.worker.min.mjs dalla versione "legacy", compatibile con più sistemi; cmaps, standard_fonts, textlayer.css) non sono stati modificati, tranne `textlayer.css`, estratto da `pdf_viewer.css`.

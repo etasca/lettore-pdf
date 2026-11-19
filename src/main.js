@@ -389,6 +389,11 @@ async function renderSlot(slot) {
   } catch (err) {
     console.error(err);
     slot.rendered = false;
+    // nella versione installata non c'è la console: mostro il motivo sulla pagina
+    const msg = document.createElement("p");
+    msg.className = "page-error";
+    msg.textContent = "⚠ " + (err?.name || "Error") + ": " + (err?.message || err);
+    slot.el.replaceChildren(msg);
     return;
   }
   if (doc !== D || myScale !== D.scale || myRot !== D.rotation || !slot.el.isConnected || !slot.rendered) return;
