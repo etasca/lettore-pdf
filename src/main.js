@@ -114,7 +114,8 @@ async function openPathNow(path) {
   docs.push(doc);
   addRecent(path, doc.name);
   activate(doc);
-  saveCover(path, pages[0]);
+  // niente anteprima salvata per i PDF protetti: resterebbe leggibile sul disco
+  if (!password) saveCover(path, pages[0]);
 }
 
 // Anteprima della prima pagina per la lista dei recenti

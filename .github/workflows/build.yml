@@ -1,0 +1,60 @@
+# Compila gli installer per Windows e Mac e li mette in una Release "bozza".
+# Si avvia a mano (Actions → Build e release → Run workflow) oppure con un tag v1.2.3.
+# La Release resta in bozza: va controllata e pubblicata a mano.
+name: Build e release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: ""
+          - platform: macos-latest
+            args: "--target universal-apple-darwin --bundles app,dmg"
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - run: npm ci
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "Lettore PDF v__VERSION__"
+          releaseBody: |
+            Scarica l'installer per il tuo sistema / Download the installer for your system:
+            - **Windows**: `Lettore PDF_*_x64-setup.exe`
+            - **Mac**: `Lettore PDF_*_universal.dmg`
+
+            L'app non è firmata digitalmente: vedi il README per superare l'avviso di Windows o del Mac.
+            The app is not code-signed: see the README to get past the Windows or Mac warning.
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
