@@ -375,3 +375,28 @@ kbd {
 #file-menu button b { font-weight: 400; }
 
 .page-error { position: absolute; top: 24px; left: 24px; right: 24px; margin: 0; color: #B3261E; font: 12px/1.5 ui-monospace, Consolas, monospace; white-space: pre-wrap; user-select: text; }
+
+/* Scheletro della pagina mentre si disegna (compare solo se il disegno dura più di un istante) */
+@keyframes sk-show { to { opacity: 1; } }
+@keyframes sk-shimmer { 0% { background-position: -150% 0; } 100% { background-position: 250% 0; } }
+.page:empty::before {
+  content: ""; position: absolute; inset: 8% 10%; opacity: 0;
+  animation: sk-show .3s ease .35s forwards;
+  background:
+    linear-gradient(#ECECEE, #ECECEE) 0 0 / 62% 2.6% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 5% / 38% 1.6% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 11% / 100% 1.3% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 15% / 96% 1.3% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 19% / 98% 1.3% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 23% / 71% 1.3% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 30% / 100% 26% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 62% / 100% 1.3% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 66% / 93% 1.3% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 70% / 97% 1.3% no-repeat,
+    linear-gradient(#ECECEE, #ECECEE) 0 74% / 58% 1.3% no-repeat;
+}
+.page:empty::after {
+  content: ""; position: absolute; inset: 0; opacity: 0;
+  animation: sk-show .3s ease .35s forwards, sk-shimmer 1.4s ease-in-out .35s infinite;
+  background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,.7) 50%, transparent 70%) 0 0 / 60% 100% no-repeat;
+}
