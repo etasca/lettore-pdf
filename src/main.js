@@ -377,9 +377,12 @@ async function renderSlot(slot) {
   slot.rendered = true;
   const doc = D, myScale = D.scale, myRot = D.rotation;
   const page = doc.pages[slot.num - 1];
-  const dpr = window.devicePixelRatio || 1;
-  const vp = vpOf(page, myScale * dpr);
   const cssVp = vpOf(page, myScale);
+  // risoluzione: nitida sugli schermi ad alta densità, ma con un tetto (≈ 8 milioni di pixel per pagina)
+  // per non rallentare i computer meno potenti e gli schermi Retina
+  const MAX_PIXELS = 8e6;
+  const dpr = Math.min(window.devicePixelRatio || 1, Math.sqrt(MAX_PIXELS / (cssVp.width * cssVp.height)));
+  const vp = vpOf(page, myScale * Math.max(dpr, 0.5));
 
   const canvas = document.createElement("canvas");
   canvas.width = Math.floor(vp.width);
@@ -538,8 +541,10 @@ function toggleLayout() {
   if (!D) return;
   const p = currentPage();
   D.layout = D.layout === "double" ? "single" : "double";
+  // due pagine affiancate = una coppia intera sullo schermo, come un libro aperto
+  D.fitMode = D.layout === "double" ? "page" : "width";
   updateLayoutButtons();
-  if (D.fitMode) refit(p); else buildPages(p);
+  refit(p);
   savePosition(D);
 }
 function updateLayoutButtons() {
