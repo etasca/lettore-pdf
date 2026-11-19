@@ -1,0 +1,15 @@
+{
+  "name": "lettore-pdf",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  },
+  "description": "Lettore PDF leggero, senza pubblicità, per Windows e Mac",
+  "license": "MIT",
+  "author": "Ermanno Tasca"
+}

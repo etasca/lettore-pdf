@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lettore PDF</title>
+  <link rel="stylesheet" href="vendor/textlayer.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="main.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <button class="icon-btn" id="btn-sidebar" data-i18n-title="top.sidebar" data-i18n-aria="top.sidebar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+    </button>
+    <button class="file-btn" id="btn-file" aria-haspopup="menu" aria-expanded="false" data-i18n="top.file">File</button>
+    <div class="tabs" id="tabs"></div>
+    <label class="search" id="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search-input" data-i18n-placeholder="top.search" autocomplete="off" spellcheck="false" />
+      <span id="search-count"></span>
+      <button class="mini" id="search-prev" data-i18n-aria="top.searchPrev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m18 15-6-6-6 6"/></svg></button>
+      <button class="mini" id="search-next" data-i18n-aria="top.searchNext"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></button>
+    </label>
+    <button class="icon-btn" id="btn-notes" data-i18n-title="top.notes" data-i18n-aria="top.notes">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span id="notes-count" class="badge"></span>
+    </button>
+    <button class="icon-btn" id="btn-print" data-i18n-title="top.print" data-i18n-aria="top.print">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-help" data-i18n-title="top.help" data-i18n-aria="top.help">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4"/><path d="M12 17h.01"/></svg>
+    </button>
+    <button class="icon-btn" id="btn-theme" data-i18n-title="top.theme" data-i18n-aria="top.theme">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </header>
+
+  <div class="content">
+    <aside id="sidebar" hidden>
+      <div class="side-tabs">
+        <button class="side-tab active" id="tab-thumbs" data-i18n="side.pages"></button>
+        <button class="side-tab" id="tab-outline" data-i18n="side.outline"></button>
+      </div>
+      <div id="thumbs" class="side-panel"></div>
+      <div id="outline" class="side-panel" hidden></div>
+    </aside>
+
+    <main id="viewer">
+      <div id="empty">
+        <div class="empty-box">
+          <p class="empty-title" data-i18n="empty.title"></p>
+          <p class="empty-sub" data-i18n="empty.or"></p>
+          <button class="primary" id="btn-open-empty" data-i18n="empty.open"></button>
+          <div id="recents"></div>
+          <p class="empty-hint" data-i18n="empty.hint"></p>
+        </div>
+      </div>
+      <div id="pages"></div>
+    </main>
+
+    <aside id="notes" hidden>
+      <div class="notes-title" data-i18n="notes.title"></div>
+      <div id="notes-list"></div>
+      <p class="notes-hint"><span data-i18n="notes.hint"></span><br><button id="autore" class="link-btn"></button></p>
+    </aside>
+  </div>
+
+  <nav class="toolbar" id="toolbar" hidden>
+    <button class="tb" id="btn-prev" data-i18n-aria="tb.prev" data-i18n-title="tb.prev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+    <span class="tb-text"><input id="page-input" value="1" data-i18n-aria="tb.page" /> / <span id="page-count">0</span></span>
+    <button class="tb" id="btn-next" data-i18n-aria="tb.next" data-i18n-title="tb.next"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+    <span class="sep"></span>
+    <button class="tb" id="btn-zoom-out" data-i18n-aria="tb.zoomOut" data-i18n-title="tb.zoomOut"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+    <span class="tb-text" id="zoom-label">100%</span>
+    <button class="tb" id="btn-zoom-in" data-i18n-aria="tb.zoomIn" data-i18n-title="tb.zoomIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="tb" id="btn-fit" data-i18n-aria="tb.fitPage" data-i18n-title="tb.fitPage"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg></button>
+    <button class="tb" id="btn-layout" data-i18n-aria="tb.double" data-i18n-title="tb.double"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="4" width="8.5" height="16" rx="1.5"/><rect x="13" y="4" width="8.5" height="16" rx="1.5"/></svg></button>
+    <button class="tb" id="btn-rotate" data-i18n-aria="tb.rotate" data-i18n-title="tb.rotate"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></button>
+  </nav>
+
+  <div id="help" class="modal-bg" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
+      <div class="modal-head">
+        <div class="modal-tabs">
+          <button class="side-tab active" id="help-tab-guide" data-i18n="help.guide"></button>
+          <button class="side-tab" id="help-tab-info" data-i18n="help.info"></button>
+        </div>
+        <button class="icon-btn" id="help-close" data-i18n-aria="help.close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body" id="help-guide" data-i18n-html="help.guideHtml"></div>
+
+      <div class="modal-body" id="help-info" hidden>
+        <div class="about">
+          <img src="assets/icona-app.png" alt="" width="72" height="72" />
+          <div>
+            <h2 data-i18n="app.name"></h2>
+            <p class="muted"><span data-i18n="help.version"></span> <span id="app-version">1.0.0</span></p>
+          </div>
+        </div>
+        <p data-i18n="help.tagline"></p>
+        <p data-i18n-html="help.licenseHtml"></p>
+        <p><label for="lang-select" data-i18n="help.language"></label>
+          <select id="lang-select" class="lang-select"></select></p>
+        <h2 data-i18n="help.credits"></h2>
+        <p data-i18n="help.creditsIntro"></p>
+        <ul class="credits">
+          <li><a href="https://github.com/mozilla/pdf.js" data-ext>PDF.js</a> <span data-i18n="help.creditPdfjs"></span></li>
+          <li><a href="https://github.com/Hopding/pdf-lib" data-ext>pdf-lib</a> <span data-i18n="help.creditPdflib"></span></li>
+          <li><a href="https://tauri.app" data-ext>Tauri</a> <span data-i18n="help.creditTauri"></span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div id="file-menu" role="menu" hidden>
+    <button role="menuitem" data-act="open"><b data-i18n="menu.open"></b><span data-i18n="{mod}+O"></span></button>
+    <div class="sep-h"></div>
+    <button role="menuitem" data-act="save" data-doc><b data-i18n="menu.save"></b><span data-i18n="{mod}+S"></span></button>
+    <button role="menuitem" data-act="saveas" data-doc><b data-i18n="menu.saveAs"></b><span data-i18n="{mod}+{shift}+S"></span></button>
+    <div class="sep-h"></div>
+    <button role="menuitem" data-act="print" data-doc><b data-i18n="menu.print"></b><span data-i18n="{mod}+P"></span></button>
+    <button role="menuitem" data-act="reveal" data-doc><b data-i18n="menu.reveal"></b></button>
+    <div class="sep-h"></div>
+    <button role="menuitem" data-act="close" data-doc><b data-i18n="menu.close"></b><span data-i18n="{mod}+W"></span></button>
+    <div class="sep-h"></div>
+    <button role="menuitem" data-act="help"><b data-i18n="menu.help"></b><span>F1</span></button>
+  </div>
+  <div id="sel-menu" hidden></div>
+  <div id="status" hidden></div>
+  <div id="print-area"></div>
+</body>
+</html>
