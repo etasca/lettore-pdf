@@ -10,6 +10,10 @@
   <a href="#english">English below ↓</a>
 </p>
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="Lettore PDF con due pagine affiancate, le miniature a sinistra e il menu per evidenziare il testo selezionato" width="900">
+</p>
+
 ---
 
 ## Italiano
