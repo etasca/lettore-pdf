@@ -62,6 +62,12 @@ function savePosition(doc) {
 // ======================================================
 // Apertura file
 // ======================================================
+// Errore visibile nella pagina (alert() può non mostrarsi su alcune versioni di macOS)
+function problem(msg) {
+  console.error(msg);
+  (window.__lpdfShowError || alert)(String(msg));
+}
+
 const baseName = (p) => p.split(/[\\/]/).pop();
 
 const IS_WIN = /Win/.test(navigator.platform || navigator.userAgent);
@@ -83,7 +89,7 @@ async function openPathNow(path) {
   try {
     bytes = new Uint8Array(await invoke("read_pdf", { path }));
   } catch (err) {
-    alert(t("msg.readError", { err }));
+    problem(t("msg.readError", { err }));
     removeRecent(path);
     renderRecents();
     return;
@@ -94,7 +100,7 @@ async function openPathNow(path) {
     ({ pdf, password } = await loadPdf(bytes, baseName(path)));
   } catch (err) {
     if (err?.name === "PasswordAbandoned") return; // l'utente ha annullato
-    alert(t("msg.invalidPdf", { err: err.message }));
+    problem(t("msg.invalidPdf", { err: err?.message || err }));
     return;
   }
   const pages = [];
@@ -102,7 +108,7 @@ async function openPathNow(path) {
     for (let n = 1; n <= pdf.numPages; n++) pages.push(await pdf.getPage(n));
   } catch (err) {
     try { (pdf.loadingTask ?? pdf).destroy?.(); } catch {}
-    alert(t("msg.invalidPdf", { err: err.message }));
+    problem(t("msg.invalidPdf", { err: err?.message || err }));
     return;
   }
   const doc = newDoc(path, baseName(path), pdf, pages);
@@ -168,7 +174,7 @@ async function openDialog() {
     });
     if (!res) return;
     for (const p of [].concat(res)) await openPath(typeof p === "string" ? p : p.path);
-  } catch (err) { alert(t("msg.openError", { err })); }
+  } catch (err) { problem(t("msg.openError", { err })); }
 }
 
 $("btn-open-empty").onclick = openDialog;
@@ -1075,4 +1081,5 @@ setupLanguageSelect();
 // Avvio
 // ======================================================
 showEmpty();
-invoke("startup_files").then(async (files) => { for (const f of files) await openPath(f); });
+window.__LPDF_READY = true;
+invoke("startup_files").then(async (files) => { for (const f of files) await openPath(f); }).catch((err) => problem("startup_files: " + err));
