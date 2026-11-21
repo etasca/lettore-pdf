@@ -82,10 +82,26 @@ fn write_pdf(request: tauri::ipc::Request<'_>) -> Result<(), String> {
     })
 }
 
+/// File ricevuti dal Finder (macOS non li passa come argomenti ma come evento "Opened").
+#[derive(Default)]
+struct Pending {
+    ready: bool,
+    files: Vec<String>,
+}
+struct OpenedFiles(std::sync::Mutex<Pending>);
+
 /// I PDF passati all'avvio (doppio clic su un file / "Apri con").
 #[tauri::command]
-fn startup_files() -> Vec<String> {
-    pdf_args(std::env::args(), None)
+fn startup_files(state: tauri::State<OpenedFiles>) -> Vec<String> {
+    let mut files = pdf_args(std::env::args(), None);
+    let mut p = state.0.lock().unwrap();
+    p.ready = true; // da ora i file arrivano come evento
+    for f in p.files.drain(..) {
+        if !files.contains(&f) {
+            files.push(f);
+        }
+    }
+    files
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -103,7 +119,38 @@ pub fn run() {
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .manage(OpenedFiles(Default::default()))
         .invoke_handler(tauri::generate_handler![read_pdf, write_pdf, startup_files])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app, event| {
+            let _ = &app;
+            match event {
+                // macOS: doppio clic / "Apri con" / trascinamento sull'icona nel Dock
+                #[cfg(target_os = "macos")]
+                tauri::RunEvent::Opened { urls } => {
+                    let files: Vec<String> = urls
+                        .iter()
+                        .filter_map(|u| u.to_file_path().ok())
+                        .map(|p| p.to_string_lossy().into_owned())
+                        .filter(|p| is_pdf(p))
+                        .collect();
+                    if files.is_empty() {
+                        return;
+                    }
+                    let state = app.state::<OpenedFiles>();
+                    let mut p = state.0.lock().unwrap();
+                    if p.ready {
+                        let _ = app.emit("open-files", files);
+                        if let Some(w) = app.get_webview_window("main") {
+                            let _ = w.unminimize();
+                            let _ = w.set_focus();
+                        }
+                    } else {
+                        p.files.extend(files);
+                    }
+                }
+                _ => {}
+            }
+        });
 }
